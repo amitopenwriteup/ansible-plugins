@@ -1,0 +1,28 @@
+---
+- name: Test Custom Callback Plugin
+  hosts: local
+  gather_facts: yes
+  
+  tasks:
+    - name: Quick task
+      debug:
+        msg: "This is a quick task"
+    
+    - name: Slow task
+      shell: sleep 3
+      changed_when: false
+    
+    - name: Another quick task
+      debug:
+        msg: "Another quick task"
+    
+    - name: Task that changes something
+      file:
+        path: /tmp/test_callback
+        state: directory
+    
+    - name: Skipped task
+      debug:
+        msg: "This will be skipped"
+      when: false
+

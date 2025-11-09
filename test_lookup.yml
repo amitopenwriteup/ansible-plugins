@@ -1,0 +1,24 @@
+---
+- name: Test Custom Lookup Plugin
+  hosts: local
+  gather_facts: no
+  
+  tasks:
+    - name: Lookup systemd process
+      debug:
+        msg: "{{ lookup('linux_process', 'systemd') }}"
+    
+    - name: Lookup nginx with detailed info
+      debug:
+        msg: "{{ lookup('linux_process', 'nginx', detailed=True) }}"
+      ignore_errors: yes
+    
+    - name: Lookup and filter high CPU processes
+      set_fact:
+        high_cpu: "{{ lookup('linux_process', 'python') }}"
+      register: proc_info
+    
+    - name: Display high CPU processes
+      debug:
+        msg: "Found {{ proc_info.ansible_facts.high_cpu.found }} Python processes"
+

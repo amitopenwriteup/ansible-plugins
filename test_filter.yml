@@ -1,0 +1,37 @@
+---
+- name: Test Custom Filter Plugin
+  hosts: local
+  gather_facts: yes
+  
+  tasks:
+    - name: Format bytes
+      debug:
+        msg:
+          - "1 GB: {{ 1073741824 | format_bytes }}"
+          - "500 MB: {{ 524288000 | format_bytes }}"
+          - "1.5 KB: {{ 1536 | format_bytes }}"
+    
+    - name: Convert permissions
+      debug:
+        msg:
+          - "755 to symbolic: {{ '755' | octal_to_symbolic }}"
+          - "644 to symbolic: {{ '644' | octal_to_symbolic }}"
+          - "rwxr-xr-x to octal: {{ 'rwxr-xr-x' | symbolic_to_octal }}"
+    
+    - name: Get and parse uptime
+      shell: uptime
+      register: uptime_output
+      changed_when: false
+    
+    - name: Parse uptime
+      debug:
+        msg: "{{ uptime_output.stdout | parse_uptime }}"
+    
+    - name: Extract IPs from text
+      debug:
+        msg: "{{ 'Connection from 192.168.1.10 to 10.0.0.1' | extract_ip_addresses }}"
+    
+    - name: Calculate disk usage
+      debug:
+        msg: "Disk usage: {{ 50000000000 | calculate_disk_usage_percent(100000000000) }}%"
+

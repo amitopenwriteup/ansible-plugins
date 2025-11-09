@@ -1,0 +1,29 @@
+---
+- name: Test Custom Action Plugin
+  hosts: local
+  become: yes
+  tasks:
+    - name: Create test nginx config
+      copy:
+        content: |
+          server {
+              listen 80;
+              server_name example.com;
+              root /var/www/html;
+          }
+        dest: /tmp/nginx.conf
+    - name: Deploy nginx config with validation
+      deploy_config:
+        src: /tmp/nginx.conf
+        dest: /etc/nginx/sites-available/test.conf
+        validate: 'nginx -t -c %s'
+        backup: yes
+        mode: '0644'
+      register: deploy_result
+      ignore_errors: yes
+    - name: Display deployment result
+      debug:
+        msg:
+          - "Changed: {{ deploy_result.changed }}"
+          - "Backup: {{ deploy_result.backup_file | default('none') }}"
+          - "Validation: {{ deploy_result.validation | default('not performed') }}"

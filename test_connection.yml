@@ -1,0 +1,38 @@
+---
+- name: Test Custom Connection Plugin
+  hosts: local
+  connection: custom_ssh  # Use our custom connection plugin
+  vars:
+    ansible_ssh_log_commands: true
+  
+  tasks:
+    - name: Execute simple command
+      command: hostname
+      register: hostname_result
+    
+    - name: Display hostname
+      debug:
+        msg: "Hostname: {{ hostname_result.stdout }}"
+    
+    - name: Create test file
+      copy:
+        content: "Test content from custom_ssh connection"
+        dest: /tmp/test_connection.txt
+    
+    - name: Read test file
+      command: cat /tmp/test_connection.txt
+      register: file_content
+    
+    - name: Display content
+      debug:
+        msg: "{{ file_content.stdout }}"
+    
+    - name: Check connection log
+      command: tail -20 /tmp/ansible_custom_ssh.log
+      register: log_content
+      changed_when: false
+    
+    - name: Display connection log
+      debug:
+        msg: "{{ log_content.stdout_lines }}"
+
